@@ -1,135 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap');
 
-/* --- RESET GLOBAL --- */
+/* --- RESET TOTAL (Wajib untuk menimpa bawaan Vite) --- */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
+html, body {
   font-family: 'Nunito', sans-serif;
-  background-color: #FFF5F7; /* Warna dasar pastel anak */
-  color: #4A4A4A;
-}
-
-/* --- TAMPILAN BERANDA (ANAK) --- */
-.app-container {
+  background-color: #F8F9FA;
+  color: #333;
+  /* Mematikan centering vertikal bawaan Vite agar tidak terpotong */
+  display: block !important; 
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(255, 182, 193, 0.2);
-}
-
-.nav-logo {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #FF8E9E;
-  text-decoration: none;
-}
-
-.nav-links {
-  display: flex;
-  gap: 20px;
-}
-
-.nav-item {
-  text-decoration: none;
-  color: #6B6B6B;
-  font-weight: 600;
-  transition: color 0.3s;
-}
-
-.nav-item:hover {
-  color: #FF8E9E;
-}
-
-.main-content {
-  flex: 1;
-  padding: 40px;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
 }
 
-.dashboard-header {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.dashboard-header h1 {
-  font-size: 2.5rem;
-  color: #FF8E9E;
-  margin-bottom: 10px;
-}
-
-.chapter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 30px;
-}
-
-.chapter-card {
-  background: white;
-  border-radius: 30px;
-  padding: 30px;
-  text-align: center;
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 4px solid transparent;
-  box-shadow: 0 10px 20px rgba(255, 182, 193, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.chapter-card:hover {
-  transform: translateY(-10px);
-  border-color: #FFB6C1;
-  box-shadow: 0 15px 30px rgba(255, 182, 193, 0.3);
-}
-
-.chapter-icon {
-  font-size: 4rem;
-  margin-bottom: 15px;
-}
-
-.chapter-card h3 {
-  font-size: 1.5rem;
-  color: #5C5C5C;
-  margin-bottom: 10px;
-}
-
-.chapter-card p {
-  font-size: 1rem;
-  color: #8E8E8E;
-  margin-bottom: 20px;
-  line-height: 1.4;
-}
-
-.play-btn {
-  background-color: #FFB6C1;
-  color: white;
-  padding: 10px 25px;
-  border-radius: 50px;
-  font-weight: 800;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.loading, .empty-state {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #FF8E9E;
-  margin-top: 50px;
+#root {
+  /* Mematikan pembatasan lebar & padding bawaan Vite */
+  display: block !important; 
+  width: 100%;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
 }
