@@ -1,0 +1,287 @@
+/* Base Layout */
+.admin-wrapper {
+  font-family: 'Nunito', sans-serif;
+  background-color: #F8F9FA;
+  min-height: 100vh;
+  padding-bottom: 80px; /* Ruang untuk bottom nav */
+  color: #333;
+}
+
+/* Top Navigation */
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.icon-menu, .icon-settings {
+  font-size: 1.5rem;
+  color: #2D6A76;
+  cursor: pointer;
+}
+
+.logo-text {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #2D6A76;
+  margin: 0;
+}
+
+/* Header Section */
+.admin-header {
+  padding: 0 20px;
+  margin-bottom: 30px;
+}
+
+.admin-header h2 {
+  font-size: 2rem;
+  color: #2D6A76;
+  margin-bottom: 10px;
+}
+
+.admin-header p {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.btn-add {
+  background-color: #356D7A;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: auto;
+  box-shadow: 0 4px 6px rgba(53, 109, 122, 0.2);
+}
+
+/* Chapters Section */
+.admin-section {
+  padding: 0 20px;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-title h3 {
+  font-size: 1.2rem;
+  color: #222;
+}
+
+.view-all {
+  color: #2D6A76;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chapter-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.icon-circle {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.bg-light-blue { background-color: #C1E5E8; color: #2D6A76; }
+.bg-light-green { background-color: #C8E6C9; color: #2E7D32; }
+.bg-light-pink { background-color: #F4D1D9; color: #AD1457; }
+
+.card-actions button {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #666;
+  margin-left: 10px;
+}
+
+.chapter-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+.meta-text {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 15px;
+}
+
+.badges {
+  display: flex;
+  gap: 10px;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bg-green { background-color: #BEE3CC; color: #276240; }
+.bg-pink { background-color: #EAC4D5; color: #803A58; }
+
+/* History Section */
+.history-section {
+  background: #F0F0F0;
+  margin: 0 20px;
+  padding: 25px 20px;
+  border-radius: 20px;
+}
+
+.history-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #E5E5E5;
+  padding: 10px 15px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  margin-left: 10px;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th {
+  text-align: left;
+  font-size: 0.85rem;
+  color: #555;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #DDD;
+}
+
+.history-table td {
+  padding: 15px 0;
+  font-size: 0.9rem;
+}
+
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.score-bar {
+  height: 6px;
+  border-radius: 3px;
+  width: 80%;
+}
+
+.bar-blue { background-color: #356D7A; }
+.bar-green { background-color: #40795A; width: 60%; }
+.bar-purple { background-color: #6E5368; width: 70%; }
+
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 10px;
+  box-shadow: 0 -2px 15px rgba(0,0,0,0.05);
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: #999;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.nav-item.active {
+  color: #2D6A76;
+}
+
+.nav-item.active .icon {
+  background: #A4D4DC;
+  padding: 8px 15px;
+  border-radius: 20px;
+  color: #2D6A76;
+}
+
+.nav-item .icon {
+  font-size: 1.2rem;
+}
