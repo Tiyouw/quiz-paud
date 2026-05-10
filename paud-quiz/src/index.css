@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap');
 
-/* --- RESET TOTAL (Wajib untuk menimpa bawaan Vite) --- */
+/* --- RESET TOTAL --- */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,18 +11,20 @@ html, body {
   font-family: 'Nunito', sans-serif;
   background-color: #F8F9FA;
   color: #333;
-  /* Mematikan centering vertikal bawaan Vite agar tidak terpotong */
-  display: block !important; 
-  min-height: 100vh;
   width: 100%;
+  min-height: 100vh;
+  /* Memastikan browser mengizinkan scroll ke bawah dan tidak bergeser ke samping */
+  overflow-y: auto; 
+  overflow-x: hidden; 
 }
 
 #root {
-  /* Mematikan pembatasan lebar & padding bawaan Vite */
-  display: block !important; 
+  /* JURUS PAMUNGKAS: Paksa kerangka utama menempel persis di ujung atas & kiri layar */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-align: left !important;
+  min-height: 100vh;
+  text-align: left;
 }

@@ -1,163 +1,139 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import './Admin.css';
 
 function Admin() {
+  const [chapters, setChapters] = useState([]);
+  const [scores, setScores] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  async function fetchDashboardData() {
+    try {
+      setLoading(true);
+      
+      // Mengambil 3 Bab dari database
+      const { data: chaptersData, error: chaptersError } = await supabase
+        .from('chapters')
+        .select('*')
+        .limit(3);
+
+      // Mengambil 10 Riwayat skor terbaru
+      const { data: scoresData, error: scoresError } = await supabase
+        .from('scores')
+        .select('*, chapters(title)')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (chaptersError) throw chaptersError;
+      setChapters(chaptersData || []);
+      setScores(scoresData || []);
+    } catch (error) {
+      console.error("Error loading dashboard:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="admin-wrapper">
-      {/* Top Navbar */}
-      <nav className="admin-topbar">
-        <div className="topbar-left">
-          <span className="icon-menu">☰</span>
-          <h1 className="logo-text">SiKecilPintar</h1>
-        </div>
-        <span className="icon-settings">⚙️</span>
-      </nav>
-
-      {/* Header Section */}
       <header className="admin-header">
-        <h2>Dasbor Kuis</h2>
-        <p>
-          Kelola konten edukasi Anda dan pantau kemajuan siswa dengan mudah. 
-          Semua yang Anda butuhkan untuk memelihara keingintahuan si kecil ada di sini.
-        </p>
-        <button className="btn-add">
-          <span className="icon-plus">⊕</span> Tambah Soal Baru
-        </button>
+        <h2>Halo, Guru Pintar! 👋</h2>
+        <p>Mari lihat ringkasan aktivitas belajar hari ini.</p>
       </header>
 
-      {/* Chapters Section */}
+      {/* Bagian Bab */}
       <section className="admin-section">
         <div className="section-title">
-          <h3>Bab Saat Ini</h3>
-          <a href="#" className="view-all">Lihat Semua</a>
+          <h3>Bab Pilihan</h3>
+          <Link to="/lessons" className="view-all">Lihat Semua</Link>
         </div>
 
         <div className="chapter-list">
-          {/* Card 1 */}
-          <div className="chapter-card">
-            <div className="card-top">
-              <div className="icon-circle light-blue">🧮</div>
-              <div className="card-actions">
-                <button>✎</button>
-                <button>🗑️</button>
+          {loading ? (
+            <p>Memuat bab...</p>
+          ) : chapters.length > 0 ? (
+            chapters.map((chapter) => (
+              <div className="chapter-card" key={chapter.id}>
+                <div className="card-top">
+                  <div className="card-top-left">
+                    <div className="icon-circle bg-light-blue">
+                      {chapter.icon || '⭐'}
+                    </div>
+                    <span className="chapter-category">
+                      {chapter.Category || 'Umum'}
+                    </span>
+                  </div>
+                  
+                  <div className="card-actions">
+                    <button className="edit-btn">📝</button>
+                    <button className="delete-btn">🗑️</button>
+                  </div>
+                </div>
+                
+                <h4>{chapter.title}</h4>
+                <p className="meta-text">{chapter.description || 'Mari belajar bersama!'}</p>
+                
+                <Link to={`/quiz/${chapter.id}`} className="start-quiz-btn">
+                  Mulai Quiz
+                </Link>
               </div>
+            ))
+          ) : (
+            <div className="empty-state">
+              <p>Belum ada bab di database.</p>
             </div>
-            <h4>Angka & Bentuk</h4>
-            <p className="meta-text">12 Soal • Diperbarui 2 hari yang lalu</p>
-            <div className="badges">
-              <span className="badge bg-green">Matematika</span>
-              <span className="badge bg-pink">Level 1</span>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="chapter-card">
-            <div className="card-top">
-              <div className="icon-circle light-green">🖌️</div>
-              <div className="card-actions">
-                <button>✎</button>
-                <button>🗑️</button>
-              </div>
-            </div>
-            <h4>Warna Alam</h4>
-            <p className="meta-text">8 Soal • Diperbarui 5 hari yang lalu</p>
-            <div className="badges">
-              <span className="badge bg-green">Seni</span>
-              <span className="badge bg-pink">Level 1</span>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="chapter-card">
-            <div className="card-top">
-              <div className="icon-circle light-pink">📖</div>
-              <div className="card-actions">
-                <button>✎</button>
-                <button>🗑️</button>
-              </div>
-            </div>
-            <h4>Waktu Cerita ABC</h4>
-            <p className="meta-text">15 Soal • Diperbarui kemarin</p>
-            <div className="badges">
-              <span className="badge bg-green">Bahasa</span>
-              <span className="badge bg-pink">Level 2</span>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
-      {/* History Section */}
+      {/* Bagian Riwayat Skor */}
       <section className="history-section">
-        <h3>Riwayat Kuis Siswa</h3>
-        <p className="subtitle">Performa terbaru di semua bab aktif</p>
+        <div className="section-title">
+          <h3>Riwayat Terbaru</h3>
+          <Link to="/scores" className="view-all">Lihat Semua</Link>
+        </div>
         
-        <div className="search-box">
-          <span className="icon-search">🔍</span>
-          <input type="text" placeholder="Cari siswa..." />
+        <div className="table-container">
+          <table className="history-table">
+            <thead>
+              <tr>
+                <th>Siswa</th>
+                <th>Bab</th>
+                <th>Skor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scores.length > 0 ? (
+                scores.map((score) => (
+                  <tr key={score.id}>
+                    <td>
+                      <div className="student-info">
+                        <div className="avatar">
+                          {score.student_name.charAt(0).toUpperCase()}
+                        </div>
+                        <span>{score.student_name}</span>
+                      </div>
+                    </td>
+                    <td>{score.chapters?.title || 'Umum'}</td>
+                    <td><span className="score-text">{score.score}/100</span></td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" style={{ textAlign: 'center', padding: '20px' }}>
+                    Belum ada riwayat nilai.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-
-        <table className="history-table">
-          <thead>
-            <tr>
-              <th>Nama Siswa</th>
-              <th>Bab</th>
-              <th>Skor</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <div className="student-info">
-                  <div className="avatar bg-light-blue">AM</div>
-                  <span>Aria Miller</span>
-                </div>
-              </td>
-              <td>Angka & Bentuk</td>
-              <td><div className="score-bar bar-blue"></div></td>
-            </tr>
-            <tr>
-              <td>
-                <div className="student-info">
-                  <div className="avatar bg-light-green">LB</div>
-                  <span>Leo Brooks</span>
-                </div>
-              </td>
-              <td>Waktu Cerita ABC</td>
-              <td><div className="score-bar bar-green"></div></td>
-            </tr>
-            <tr>
-              <td>
-                <div className="student-info">
-                  <div className="avatar bg-light-pink">SC</div>
-                  <span>Sam Chen</span>
-                </div>
-              </td>
-              <td>Warna Alam</td>
-              <td><div className="score-bar bar-purple"></div></td>
-            </tr>
-          </tbody>
-        </table>
       </section>
-
-      {/* Bottom Navigation */}
-      <nav className="bottom-nav">
-        <div className="nav-item active">
-          <span className="icon">🏠</span>
-          <span>Beranda</span>
-        </div>
-        <div className="nav-item">
-          <span className="icon">📚</span>
-          <span>Pelajaran</span>
-        </div>
-        <div className="nav-item">
-          <span className="icon">🏆</span>
-          <span>Penghargaan</span>
-        </div>
-        <div className="nav-item">
-          <span className="icon">👤</span>
-          <span>Profil</span>
-        </div>
-      </nav>
     </div>
   );
 }
