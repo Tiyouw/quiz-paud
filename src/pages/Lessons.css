@@ -276,6 +276,57 @@
   cursor: pointer;
 }
 
+/* --- TAMBAHAN UNTUK LAYOUT TOMBOL BARU --- */
+
+.lesson-actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto; /* Mendorong tombol selalu ke bagian paling bawah kartu */
+  padding-top: 15px;
+  border-top: 1px dashed #E0F2F1;
+}
+
+.lesson-actions-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Tombol Mulai Kuis (User/Anak-anak) */
+.btn-start-quiz {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: #FFB300;
+  color: white;
+  padding: 12px;
+  border-radius: 15px;
+  text-decoration: none;
+  font-weight: 900;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 0 #E65100;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.btn-start-quiz:hover {
+  background: #FFC107;
+  transform: translateY(-2px);
+}
+
+.btn-start-quiz:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 #E65100;
+}
+
+/* Sedikit penyesuaian jika card-nya belum pakai flex column */
+.lesson-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 /* --- RESPONSIVE LAPTOP --- */
 @media (min-width: 768px) {
   .lessons-wrapper { 

@@ -8,7 +8,7 @@ function Lessons() {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Semua');
-  
+ 
   // State untuk form tambah/edit bab
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingChapterId, setEditingChapterId] = useState(null);
@@ -37,8 +37,8 @@ function Lessons() {
   }
 
   const dynamicTabs = ['Semua', ...new Set(chapters.map(c => c.Category || 'Umum'))];
-  const filteredChapters = activeTab === 'Semua' 
-    ? chapters 
+  const filteredChapters = activeTab === 'Semua'
+    ? chapters
     : chapters.filter(c => (c.Category || 'Umum') === activeTab);
 
   // --- HANDLER MODAL TAMBAH & EDIT ---
@@ -65,10 +65,10 @@ function Lessons() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const payload = { 
-        title: newChapter.title, 
-        description: newChapter.description, 
-        Category: newChapter.Category || 'Umum' 
+      const payload = {
+        title: newChapter.title,
+        description: newChapter.description,
+        Category: newChapter.Category || 'Umum'
       };
 
       if (editingChapterId) {
@@ -145,15 +145,14 @@ function Lessons() {
       <section className="lessons-content">
         <div className="lessons-grid">
           {loading ? (
-            <p>Memuat...</p>
+            <p className="loading-text">Memuat pelajaran...</p>
           ) : filteredChapters.length > 0 ? (
             filteredChapters.map((chapter) => (
               <div className="lesson-card" key={chapter.id}>
-                
-                {/* TOMBOL AKSI POJOK KANAN ATAS */}
+               
+                {/* TOMBOL AKSI POJOK KANAN ATAS (ADMIN) */}
                 <div className="card-top-actions">
                   <button className="btn-card-edit" onClick={() => openModalForEdit(chapter)} title="Edit Bab">✏️</button>
-                  {/* Tombol Hapus sekarang memanggil confirmDelete, bukan window.confirm langsung */}
                   <button className="btn-card-delete" onClick={() => confirmDelete(chapter.id)} title="Hapus Bab">🗑️</button>
                 </div>
 
@@ -162,14 +161,23 @@ function Lessons() {
                 </div>
                 <h4>{chapter.title}</h4>
                 <p className="lesson-meta">{chapter.description || 'Tidak ada deskripsi'}</p>
-                <div className="lesson-actions">
-                  <span className="category-badge">{chapter.Category || 'Umum'}</span>
-                  <Link to={`/chapter/${chapter.id}`} className="btn-edit-lesson">Kelola Soal</Link>
+                
+                {/* BAGIAN TOMBOL BAWAH */}
+                <div className="lesson-actions-container">
+                  <div className="lesson-actions-top">
+                    <span className="category-badge">{chapter.Category || 'Umum'}</span>
+                    <Link to={`/chapter/${chapter.id}`} className="btn-edit-lesson">Kelola Soal</Link>
+                  </div>
+                  {/* TOMBOL BARU: MULAI KUIS */}
+                  <Link to={`/quiz/${chapter.id}`} className="btn-start-quiz">
+                    🚀 Mulai Quiz
+                  </Link>
                 </div>
+
               </div>
             ))
           ) : (
-            <p>Belum ada materi di kategori ini.</p>
+            <p className="empty-text">Belum ada materi di kategori ini.</p>
           )}
         </div>
       </section>
@@ -207,16 +215,17 @@ function Lessons() {
       {isDeleteModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '400px', textAlign: 'center', padding: '40px 20px' }}>
-            <div style={{ fontSize: '3.5rem', marginBottom: '10px' }}>⚠️</div>
-            <h3 style={{ color: '#D32F2F', marginBottom: '15px' }}>Hapus Bab Pelajaran?</h3>
-            <p style={{ color: '#666', marginBottom: '25px', lineHeight: '1.6', fontSize: '0.95rem' }}>
+            <div style={{ fontSize: '3.5rem', margin: '0 auto 15px', width: '80px', height:'80px', background:'#FFEBEE', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%' }}>
+              ⚠️
+            </div>
+            <h3 style={{ color: '#D32F2F', marginBottom: '15px', fontWeight: '900' }}>Hapus Bab Pelajaran?</h3>
+            <p style={{ color: '#666', marginBottom: '25px', lineHeight: '1.6', fontSize: '0.95rem', fontWeight:'600' }}>
               Apakah Anda yakin ingin menghapus Bab ini?<br/>
-              <b>Semua soal di dalamnya</b> mungkin akan ikut terhapus secara permanen.
+              <b>Semua soal di dalamnya</b> akan ikut terhapus secara permanen.
             </p>
             <div className="modal-actions" style={{ justifyContent: 'center', marginTop: '10px' }}>
               <button type="button" className="btn-cancel" onClick={cancelDelete}>Batalkan</button>
-              {/* Tombol hapus menggunakan warna merah agar jelas */}
-              <button type="button" className="btn-save" style={{ background: '#D32F2F', border: 'none' }} onClick={executeDelete}>
+              <button type="button" className="btn-save" style={{ background: '#D32F2F', border: 'none', boxShadow:'0 4px 0 #B71C1C' }} onClick={executeDelete}>
                 Ya, Hapus!
               </button>
             </div>

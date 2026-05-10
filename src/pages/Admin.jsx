@@ -69,10 +69,10 @@ function Admin() {
                     </span>
                   </div>
                   
-                  <div className="card-actions">
+                  {/* <div className="card-actions">
                     <button className="edit-btn">📝</button>
                     <button className="delete-btn">🗑️</button>
-                  </div>
+                  </div> */}
                 </div>
                 
                 <h4>{chapter.title}</h4>
