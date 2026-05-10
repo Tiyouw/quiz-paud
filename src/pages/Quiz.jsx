@@ -54,13 +54,11 @@ function Quiz() {
     }
   };
 
-  // PERBAIKAN: Matching bisa di un-click
   const handleMatchingSelect = (questionId, idx, side) => {
     const currentPairs = answers[questionId] || {};
 
     if (side === "left") {
       if (currentPairs[idx] !== undefined) {
-        // Jika sudah dipasangkan, hapus pasangan tersebut (Un-pair)
         const newPairs = { ...currentPairs };
         delete newPairs[idx];
         setAnswers({ ...answers, [questionId]: newPairs });
@@ -69,25 +67,21 @@ function Quiz() {
           setMatchingSelection({ questionId: null, leftIdx: null });
         }
       } else {
-        // Jika belum, jadikan aktif untuk siap ditarik
         setMatchingSelection({ questionId, leftIdx: idx });
       }
     } else if (side === "right") {
-      // Cek apakah item kanan ini sudah dipasangkan dengan kiri yg lain
       let newPairs = { ...currentPairs };
       for (let leftKey in newPairs) {
         if (newPairs[leftKey] === idx) {
-          delete newPairs[leftKey]; // Lepaskan pasangan lama
+          delete newPairs[leftKey];
         }
       }
 
       if (matchingSelection.questionId === questionId && matchingSelection.leftIdx !== null) {
-        // Pasangkan dengan item kiri yang sedang aktif
         newPairs[matchingSelection.leftIdx] = idx;
         setAnswers({ ...answers, [questionId]: newPairs });
         setMatchingSelection({ questionId: null, leftIdx: null });
       } else {
-        // Jika hanya klik kanan (tanpa ada kiri yg aktif), update state (untuk un-pair)
         setAnswers({ ...answers, [questionId]: newPairs });
       }
     }
@@ -287,16 +281,24 @@ function Quiz() {
                 </div>
               )}
 
-              {/* 3. DRAG & DROP */}
+              {/* 3. DRAG & DROP - PERBAIKAN LOGIKA 0 */}
               {isDragDrop && q.options?.zones && (
                 <div className="quiz-dragdrop-container">
                   <div className="drag-items-pool">
-                    {q.options.items.map((item, iIdx) => !answers[q.id]?.[iIdx] && (
-                      <div key={iIdx} className="draggable-item" draggable onDragStart={() => handleDragStart(iIdx)} onClick={() => setDraggedItem(iIdx)}>
-                        {item.image && <img src={item.image} alt="" />}
-                        <span>{item.text}</span>
-                      </div>
-                    ))}
+                    {q.options.items.map((item, iIdx) => {
+                      // KONDISI KETAT: Periksa apakah ada nilai spesifik, bukan sekadar !answers
+                      const isItemPlaced = answers[q.id] && answers[q.id][iIdx] !== undefined;
+
+                      // Jika sudah ditempatkan (termasuk di zona 0), jangan tampilkan di daftar atas
+                      if (isItemPlaced) return null;
+
+                      return (
+                        <div key={iIdx} className="draggable-item" draggable onDragStart={() => handleDragStart(iIdx)} onClick={() => setDraggedItem(iIdx)}>
+                          {item.image && <img src={item.image} alt="" />}
+                          <span>{item.text}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                   <div className="drop-zones-grid">
                     {q.options.zones.map((z, zIdx) => (
