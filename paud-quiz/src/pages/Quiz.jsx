@@ -280,17 +280,24 @@ function Quiz() {
                 </div>
               )}
 
-              {/* 3. DRAG & DROP */}
+              {/* 3. DRAG & DROP (PERBAIKAN LOGIKA) */}
               {isDragDrop && q.options?.zones && (
                 <div className="quiz-dragdrop-container">
                   <div className="drag-items-pool">
-                    {/* PERBAIKAN: Cek explicit ke undefined agar index 0 tetap dianggap belum ditaruh */}
-                    {q.options.items.map((item, iIdx) => answers[q.id]?.[iIdx] === undefined && (
-                      <div key={iIdx} className="draggable-item" draggable onDragStart={() => handleDragStart(iIdx)} onClick={() => setDraggedItem(iIdx)}>
-                        {item.image && <img src={item.image} alt="" />}
-                        <span>{item.text}</span>
-                      </div>
-                    ))}
+                    {q.options.items.map((item, iIdx) => {
+                      // Logika ketat: Apakah item ini sudah ditaruh di kotak mana pun?
+                      const isPlaced = answers[q.id] !== undefined && answers[q.id][iIdx] !== undefined;
+                      
+                      // Jika sudah ditaruh, jangan tampilkan di atas
+                      if (isPlaced) return null;
+
+                      return (
+                        <div key={iIdx} className="draggable-item" draggable onDragStart={() => handleDragStart(iIdx)} onClick={() => setDraggedItem(iIdx)}>
+                          {item.image && <img src={item.image} alt="" />}
+                          <span>{item.text}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                   <div className="drop-zones-grid">
                     {q.options.zones.map((z, zIdx) => (
