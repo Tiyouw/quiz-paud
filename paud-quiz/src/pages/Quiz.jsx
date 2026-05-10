@@ -41,24 +41,55 @@ function Quiz() {
   // --- HANDLERS ---
   const handleAnswerSelect = (questionId, answerValue, isMultiOrSeq) => {
     if (isMultiOrSeq) {
-      const currentAnswers = answers[questionId] || [];
+      const currentAnswers = Array.isArray(answers[questionId]) ? answers[questionId] : [];
+      let newAnswers;
       if (currentAnswers.includes(answerValue)) {
-        setAnswers({ ...answers, [questionId]: currentAnswers.filter((val) => val !== answerValue) });
+        newAnswers = currentAnswers.filter((val) => val !== answerValue);
       } else {
-        setAnswers({ ...answers, [questionId]: [...currentAnswers, answerValue] });
+        newAnswers = [...currentAnswers, answerValue];
       }
+      setAnswers({ ...answers, [questionId]: newAnswers });
     } else {
       setAnswers({ ...answers, [questionId]: answerValue });
     }
   };
 
+  // PERBAIKAN: Matching bisa di un-click
   const handleMatchingSelect = (questionId, idx, side) => {
+    const currentPairs = answers[questionId] || {};
+
     if (side === "left") {
-      setMatchingSelection({ questionId, leftIdx: idx });
-    } else if (side === "right" && matchingSelection.questionId === questionId) {
-      const currentPairs = answers[questionId] || {};
-      setAnswers({ ...answers, [questionId]: { ...currentPairs, [matchingSelection.leftIdx]: idx } });
-      setMatchingSelection({ questionId: null, leftIdx: null });
+      if (currentPairs[idx] !== undefined) {
+        // Jika sudah dipasangkan, hapus pasangan tersebut (Un-pair)
+        const newPairs = { ...currentPairs };
+        delete newPairs[idx];
+        setAnswers({ ...answers, [questionId]: newPairs });
+        
+        if (matchingSelection.leftIdx === idx) {
+          setMatchingSelection({ questionId: null, leftIdx: null });
+        }
+      } else {
+        // Jika belum, jadikan aktif untuk siap ditarik
+        setMatchingSelection({ questionId, leftIdx: idx });
+      }
+    } else if (side === "right") {
+      // Cek apakah item kanan ini sudah dipasangkan dengan kiri yg lain
+      let newPairs = { ...currentPairs };
+      for (let leftKey in newPairs) {
+        if (newPairs[leftKey] === idx) {
+          delete newPairs[leftKey]; // Lepaskan pasangan lama
+        }
+      }
+
+      if (matchingSelection.questionId === questionId && matchingSelection.leftIdx !== null) {
+        // Pasangkan dengan item kiri yang sedang aktif
+        newPairs[matchingSelection.leftIdx] = idx;
+        setAnswers({ ...answers, [questionId]: newPairs });
+        setMatchingSelection({ questionId: null, leftIdx: null });
+      } else {
+        // Jika hanya klik kanan (tanpa ada kiri yg aktif), update state (untuk un-pair)
+        setAnswers({ ...answers, [questionId]: newPairs });
+      }
     }
   };
 
@@ -84,12 +115,14 @@ function Quiz() {
   };
 
   const handleDragStart = (itemIdx) => setDraggedItem(itemIdx);
+  
   const handleDropToZone = (questionId, zoneIdx) => {
     if (draggedItem === null) return;
     const current = answers[questionId] || {};
     setAnswers({ ...answers, [questionId]: { ...current, [draggedItem]: zoneIdx } });
     setDraggedItem(null);
   };
+
   const resetItem = (questionId, itemIdx) => {
     const current = answers[questionId] || {};
     const newAnswers = { ...current };
@@ -198,34 +231,39 @@ function Quiz() {
               {q.content && !isCanvas && !isHotspot && <img src={q.content} alt="Soal" className="q-main-img" />}
 
               {/* 1. MCQ / MULTI / SEQ / MOOD */}
-{isOptionBased && q.options && (
-  <div className={`options-grid ${type === "Mood/Emoji Picker" ? "mood-picker-layout" : ""}`}>
-    {q.options.map((opt, oIdx) => {
-      const isObj = typeof opt === "object" && opt !== null;
-      const displayText = isObj ? opt.text : opt;
-      const displayImage = isObj ? opt.image : null;
+              {isOptionBased && q.options && (
+                <div className={`options-grid ${type === "Mood/Emoji Picker" ? "mood-picker-layout" : ""}`}>
+                  {q.options.map((opt, oIdx) => {
+                    const isObj = typeof opt === "object" && opt !== null;
+                    const displayText = isObj ? opt.text : opt;
+                    const displayImage = isObj ? opt.image : null;
 
-      const isSelected = (type === "Multi-Select" || type === "Sequencing (Urutkan)") 
-        ? (answers[q.id] || []).includes(oIdx) 
-        : answers[q.id] === oIdx;
+                    const isSelected = (type === "Multi-Select" || type === "Sequencing (Urutkan)") 
+                      ? (answers[q.id] || []).includes(oIdx) 
+                      : answers[q.id] === oIdx;
 
-      return (
-        <div 
-          key={oIdx} 
-          className={`quiz-option ${isSelected ? "selected" : ""} ${type === "Mood/Emoji Picker" ? "mood-option" : ""}`} 
-          onClick={() => handleAnswerSelect(q.id, oIdx, (type === "Multi-Select" || type === "Sequencing (Urutkan)"))}
-        >
-          {type === "Sequencing (Urutkan)" && isSelected && (
-            <div className="seq-num">{(answers[q.id].indexOf(oIdx) + 1)}</div>
-          )}
-          
-          {displayImage && <img src={displayImage} alt="mood" className="mood-img" />}
-          <span className="mood-text">{displayText}</span>
-        </div>
-      );
-    })}
-  </div>
-)}
+                    return (
+                      <div 
+                        key={oIdx} 
+                        className={`quiz-option ${isSelected ? "selected" : ""} ${type === "Mood/Emoji Picker" ? "mood-option" : ""}`} 
+                        onClick={() => handleAnswerSelect(q.id, oIdx, (type === "Multi-Select" || type === "Sequencing (Urutkan)"))}
+                      >
+                        {type === "Sequencing (Urutkan)" && isSelected && (
+                          <div className="seq-num">{(answers[q.id].indexOf(oIdx) + 1)}</div>
+                        )}
+                        
+                        {displayImage && <img src={displayImage} alt="mood" className="mood-img" />}
+                        <span className="mood-text">{displayText}</span>
+                        
+                        {/* Lingkaran Hijau untuk Multi-Select */}
+                        {type === "Multi-Select" && (
+                          <div className={`multi-check ${isSelected ? "checked" : ""}`}></div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* 2. MATCHING */}
               {isMatching && q.options && (
@@ -355,7 +393,7 @@ function Quiz() {
                     </div>
                   </div>
                   <div className="canvas-wrapper">
-                    <CanvasDraw key={`canvas-${q.id}`} ref={el => canvasRefs.current[q.id] = el} brushColor={brushColor} brushRadius={4} canvasWidth={window.innerWidth > 600 ? 550 : 300} canvasHeight={350} imgSrc={type === "Coloring Canvas" ? q.content : ""} style={{ border: '2px solid #E0F2F1', borderRadius: '15px' }} />
+                    <CanvasDraw key={`canvas-${q.id}`} ref={el => canvasRefs.current[q.id] = el} brushColor={brushColor} brushRadius={4} canvasWidth={window.innerWidth > 600 ? 550 : 300} canvasHeight={350} imgSrc={type === "Coloring Canvas" ? q.content : ""} />
                   </div>
                 </div>
               )}
