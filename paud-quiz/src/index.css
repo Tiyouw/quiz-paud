@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap');
+
+/* --- RESET TOTAL --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  font-family: 'Nunito', sans-serif;
+  background-color: #F8F9FA;
+  color: #333;
+  width: 100%;
+  min-height: 100vh;
+  /* Memastikan browser mengizinkan scroll ke bawah dan tidak bergeser ke samping */
+  overflow-y: auto; 
+  overflow-x: hidden; 
+}
+
+#root {
+  /* JURUS PAMUNGKAS: Paksa kerangka utama menempel persis di ujung atas & kiri layar */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-height: 100vh;
+  text-align: left;
+}

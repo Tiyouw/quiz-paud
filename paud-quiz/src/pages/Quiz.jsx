@@ -249,6 +249,7 @@ function Quiz() {
                         {displayImage && <img src={displayImage} alt="mood" className="mood-img" />}
                         <span className="mood-text">{displayText}</span>
                         
+                        {/* Lingkaran Hijau untuk Multi-Select */}
                         {type === "Multi-Select" && (
                           <div className={`multi-check ${isSelected ? "checked" : ""}`}></div>
                         )}
@@ -280,16 +281,16 @@ function Quiz() {
                 </div>
               )}
 
-              {/* 3. DRAG & DROP (PERBAIKAN LOGIKA) */}
+              {/* 3. DRAG & DROP - PERBAIKAN LOGIKA 0 */}
               {isDragDrop && q.options?.zones && (
                 <div className="quiz-dragdrop-container">
                   <div className="drag-items-pool">
                     {q.options.items.map((item, iIdx) => {
-                      // Logika ketat: Apakah item ini sudah ditaruh di kotak mana pun?
-                      const isPlaced = answers[q.id] !== undefined && answers[q.id][iIdx] !== undefined;
-                      
-                      // Jika sudah ditaruh, jangan tampilkan di atas
-                      if (isPlaced) return null;
+                      // KONDISI KETAT: Periksa apakah ada nilai spesifik, bukan sekadar !answers
+                      const isItemPlaced = answers[q.id] && answers[q.id][iIdx] !== undefined;
+
+                      // Jika sudah ditempatkan (termasuk di zona 0), jangan tampilkan di daftar atas
+                      if (isItemPlaced) return null;
 
                       return (
                         <div key={iIdx} className="draggable-item" draggable onDragStart={() => handleDragStart(iIdx)} onClick={() => setDraggedItem(iIdx)}>
@@ -394,7 +395,7 @@ function Quiz() {
                     </div>
                   </div>
                   <div className="canvas-wrapper">
-                    <CanvasDraw key={`canvas-${q.id}`} ref={el => canvasRefs.current[q.id] = el} brushColor={brushColor} brushRadius={4} canvasWidth={window.innerWidth > 600 ? 550 : 300} canvasHeight={350} imgSrc={type === "Coloring Canvas" ? q.content : ""} style={{ border: '2px solid #E0F2F1', borderRadius: '15px' }} />
+                    <CanvasDraw key={`canvas-${q.id}`} ref={el => canvasRefs.current[q.id] = el} brushColor={brushColor} brushRadius={4} canvasWidth={window.innerWidth > 600 ? 550 : 300} canvasHeight={350} imgSrc={type === "Coloring Canvas" ? q.content : ""} />
                   </div>
                 </div>
               )}
