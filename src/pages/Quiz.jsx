@@ -22,13 +22,54 @@ function Quiz() {
 
   const canvasRefs = useRef({});
 
+  // Helper untuk mengacak array
+  const shuffleArray = (array) => {
+    const newArr = [...array];
+    for (let i = newArr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    }
+    return newArr;
+  };
+
   useEffect(() => {
     async function fetchQuizData() {
       try {
         const { data: chapterData } = await supabase.from("chapters").select("*").eq("id", chapterId).single();
         setChapter(chapterData);
-        const { data: questionsData } = await supabase.from("questions").select("*").eq("chapter_id", chapterId).order("id", { ascending: true });
-        setQuestions(questionsData || []);
+        
+        const { data: questionsData } = await supabase.from("questions")
+          .select("*")
+          .eq("chapter_id", chapterId)
+          .order("id", { ascending: true });
+
+        const processedQuestions = (questionsData || []).map(q => {
+          // 1. Shuffling untuk Sequencing
+          if (q.question_type === "Sequencing (Urutkan)" && Array.isArray(q.options)) {
+            const mappedOptions = q.options.map((opt, originalIdx) => ({
+              text: (typeof opt === 'object' && opt !== null) ? opt.text : opt,
+              image: (typeof opt === 'object' && opt !== null) ? opt.image : null,
+              originalIdx: originalIdx
+            }));
+            return { ...q, options: shuffleArray(mappedOptions) };
+          }
+
+          // 2. Shuffling untuk Matching
+          if (["Matching", "Matching (Tarik Garis)"].includes(q.question_type) && Array.isArray(q.options)) {
+            const leftSide = q.options.map((opt, idx) => ({ ...opt.left, originalIdx: idx }));
+            const rightSide = q.options.map((opt, idx) => ({ ...opt.right, originalIdx: idx }));
+            return { 
+              ...q, 
+              options: { 
+                left: shuffleArray(leftSide), 
+                right: shuffleArray(rightSide) 
+              } 
+            };
+          }
+          return q;
+        });
+
+        setQuestions(processedQuestions);
       } catch (error) {
         console.error("Error fetching quiz:", error);
       } finally {
@@ -54,35 +95,26 @@ function Quiz() {
     }
   };
 
-  const handleMatchingSelect = (questionId, idx, side) => {
+  const handleMatchingSelect = (questionId, originalIdx, side) => {
     const currentPairs = answers[questionId] || {};
-
     if (side === "left") {
-      if (currentPairs[idx] !== undefined) {
+      if (currentPairs[originalIdx] !== undefined) {
         const newPairs = { ...currentPairs };
-        delete newPairs[idx];
+        delete newPairs[originalIdx];
         setAnswers({ ...answers, [questionId]: newPairs });
-        
-        if (matchingSelection.leftIdx === idx) {
-          setMatchingSelection({ questionId: null, leftIdx: null });
-        }
+        if (matchingSelection.leftIdx === originalIdx) setMatchingSelection({ questionId: null, leftIdx: null });
       } else {
-        setMatchingSelection({ questionId, leftIdx: idx });
+        setMatchingSelection({ questionId, leftIdx: originalIdx });
       }
     } else if (side === "right") {
       let newPairs = { ...currentPairs };
       for (let leftKey in newPairs) {
-        if (newPairs[leftKey] === idx) {
-          delete newPairs[leftKey];
-        }
+        if (newPairs[leftKey] === originalIdx) delete newPairs[leftKey];
       }
-
       if (matchingSelection.questionId === questionId && matchingSelection.leftIdx !== null) {
-        newPairs[matchingSelection.leftIdx] = idx;
+        newPairs[matchingSelection.leftIdx] = originalIdx;
         setAnswers({ ...answers, [questionId]: newPairs });
         setMatchingSelection({ questionId: null, leftIdx: null });
-      } else {
-        setAnswers({ ...answers, [questionId]: newPairs });
       }
     }
   };
@@ -143,8 +175,17 @@ function Quiz() {
           if (correctArr.length === userArr.length && correctArr.every(v => userArr.includes(v))) correctCount += 1;
         } catch(e) {}
       } else if (q.question_type === "Sequencing (Urutkan)") {
-        const userSeq = ans || [];
-        if (userSeq.length === q.options.length && userSeq.every((val, i) => val === i)) correctCount += 1;
+        const userSeqIndices = ans || [];
+        if (userSeqIndices.length === q.options.length) {
+          const isCorrect = userSeqIndices.every((optIdxInArray, order) => q.options[optIdxInArray].originalIdx === order);
+          if (isCorrect) correctCount += 1;
+        }
+      } else if (["Matching", "Matching (Tarik Garis)"].includes(q.question_type)) {
+        if (ans) {
+          const pairs = Object.entries(ans);
+          const isAllCorrect = pairs.length === q.options.left.length && pairs.every(([leftOrig, rightOrig]) => parseInt(leftOrig) === parseInt(rightOrig));
+          if (isAllCorrect) correctCount += 1;
+        }
       } else if (q.question_type === "Drag & Drop to Zone") {
         const items = q.options.items || [];
         const isAll = items.every((item, idx) => parseInt(ans?.[idx]) === item.zoneIndex);
@@ -191,7 +232,7 @@ function Quiz() {
     return (
       <div className="quiz-result-wrapper">
         <div className="result-card">
-          <h1>Hore! {studentName} 🎉</h1>
+          <h1>Hore! {studentName} 🥳</h1>
           <div className="score-circle"><span className="score-number">{finalScore}</span></div>
           <Link to="/" className="btn-back-home">Selesai</Link>
         </div>
@@ -228,9 +269,16 @@ function Quiz() {
               {isOptionBased && q.options && (
                 <div className={`options-grid ${type === "Mood/Emoji Picker" ? "mood-picker-layout" : ""}`}>
                   {q.options.map((opt, oIdx) => {
-                    const isObj = typeof opt === "object" && opt !== null;
-                    const displayText = isObj ? opt.text : opt;
-                    const displayImage = isObj ? opt.image : null;
+                    // DEFENSIVE: Pastikan tidak merender objek mentah
+                    let displayText = "";
+                    let displayImage = null;
+
+                    if (typeof opt === 'string') {
+                      displayText = opt;
+                    } else if (opt && typeof opt === 'object') {
+                      displayText = opt.text || "";
+                      displayImage = opt.image || null;
+                    }
 
                     const isSelected = (type === "Multi-Select" || type === "Sequencing (Urutkan)") 
                       ? (answers[q.id] || []).includes(oIdx) 
@@ -245,14 +293,9 @@ function Quiz() {
                         {type === "Sequencing (Urutkan)" && isSelected && (
                           <div className="seq-num">{(answers[q.id].indexOf(oIdx) + 1)}</div>
                         )}
-                        
-                        {displayImage && <img src={displayImage} alt="mood" className="mood-img" />}
+                        {displayImage && <img src={displayImage} alt="" className="mood-img" />}
                         <span className="mood-text">{displayText}</span>
-                        
-                        {/* Lingkaran Hijau untuk Multi-Select */}
-                        {type === "Multi-Select" && (
-                          <div className={`multi-check ${isSelected ? "checked" : ""}`}></div>
-                        )}
+                        {type === "Multi-Select" && <div className={`multi-check ${isSelected ? "checked" : ""}`}></div>}
                       </div>
                     );
                   })}
@@ -260,42 +303,38 @@ function Quiz() {
               )}
 
               {/* 2. MATCHING */}
-              {isMatching && q.options && (
+              {isMatching && q.options?.left && (
                 <div className="quiz-matching-container">
                   <div className="matching-column">
-                    {q.options.map((opt, mIdx) => (
-                      <div key={mIdx} className={`match-item ${matchingSelection.leftIdx === mIdx && matchingSelection.questionId === q.id ? "active-select" : ""} ${answers[q.id]?.[mIdx] !== undefined ? "paired" : ""}`} onClick={() => handleMatchingSelect(q.id, mIdx, "left")}>
-                        {opt.left?.image && <img src={opt.left.image} alt="" className="match-img-large" />}
-                        <span>{opt.left?.text}</span>
+                    {q.options.left.map((item, lIdx) => (
+                      <div key={lIdx} className={`match-item ${matchingSelection.leftIdx === item.originalIdx && matchingSelection.questionId === q.id ? "active-select" : ""} ${answers[q.id]?.[item.originalIdx] !== undefined ? "paired" : ""}`} onClick={() => handleMatchingSelect(q.id, item.originalIdx, "left")}>
+                        {item.image && <img src={item.image} alt="" className="match-img-large" />}
+                        <span>{item.text || ""}</span>
                       </div>
                     ))}
                   </div>
                   <div className="matching-column">
-                    {q.options.map((opt, mIdx) => (
-                      <div key={mIdx} className={`match-item right ${Object.values(answers[q.id] || {}).includes(mIdx) ? "paired" : ""}`} onClick={() => handleMatchingSelect(q.id, mIdx, "right")}>
-                        <span>{opt.right?.text}</span>
-                        {opt.right?.image && <img src={opt.right.image} alt="" className="match-img-large" />}
+                    {q.options.right.map((item, rIdx) => (
+                      <div key={rIdx} className={`match-item right ${Object.values(answers[q.id] || {}).includes(item.originalIdx) ? "paired" : ""}`} onClick={() => handleMatchingSelect(q.id, item.originalIdx, "right")}>
+                        <span>{item.text || ""}</span>
+                        {item.image && <img src={item.image} alt="" className="match-img-large" />}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* 3. DRAG & DROP - PERBAIKAN LOGIKA 0 */}
+              {/* 3. DRAG & DROP */}
               {isDragDrop && q.options?.zones && (
                 <div className="quiz-dragdrop-container">
                   <div className="drag-items-pool">
                     {q.options.items.map((item, iIdx) => {
-                      // KONDISI KETAT: Periksa apakah ada nilai spesifik, bukan sekadar !answers
                       const isItemPlaced = answers[q.id] && answers[q.id][iIdx] !== undefined;
-
-                      // Jika sudah ditempatkan (termasuk di zona 0), jangan tampilkan di daftar atas
                       if (isItemPlaced) return null;
-
                       return (
                         <div key={iIdx} className="draggable-item" draggable onDragStart={() => handleDragStart(iIdx)} onClick={() => setDraggedItem(iIdx)}>
                           {item.image && <img src={item.image} alt="" />}
-                          <span>{item.text}</span>
+                          <span>{item.text || ""}</span>
                         </div>
                       );
                     })}
@@ -308,7 +347,7 @@ function Quiz() {
                           {Object.entries(answers[q.id] || {}).map(([iI, zI]) => parseInt(zI) === zIdx && (
                             <div key={iI} className="placed-item" onClick={e=>{e.stopPropagation(); resetItem(q.id, iI)}}>
                               {q.options.items[iI].image && <img src={q.options.items[iI].image} alt="" />}
-                              <span>{q.options.items[iI].text}</span>
+                              <span>{q.options.items[iI].text || ""}</span>
                             </div>
                           ))}
                         </div>
@@ -329,7 +368,7 @@ function Quiz() {
                       <div key={i} className="tapmark-item" onClick={() => handleTapMark(q.id, i, q.options.categories.length)}>
                         {answers[q.id]?.[i] >= 0 && <div className="floating-mark">{q.options.categories[answers[q.id][i]].symbol}</div>}
                         {item.image && <img src={item.image} alt="" className="tapmark-img" />}
-                        <span>{item.text}</span>
+                        <span>{item.text || ""}</span>
                       </div>
                     ))}
                   </div>
@@ -343,7 +382,7 @@ function Quiz() {
                     <img src={q.content} alt="" className="hotspot-main-img" />
                     {q.options.map((h, hIdx) => (
                       <div key={hIdx} className={`hotspot-dot ${answers[q.id]?.includes(hIdx) ? 'active' : ''}`} style={{ left: `${h.x}%`, top: `${h.y}%` }} onClick={() => handleHotspotClick(q.id, hIdx)}>
-                        {answers[q.id]?.includes(hIdx) ? h.label : '?'}
+                        {answers[q.id]?.includes(hIdx) ? (h.label || "") : '?'}
                       </div>
                     ))}
                   </div>
@@ -356,7 +395,7 @@ function Quiz() {
                   {q.options.map((item, cIdx) => (
                     <div key={cIdx} className="counting-card">
                       {item.image && <img src={item.image} alt="" />}
-                      <p>{item.name}</p>
+                      <p>{item.name || ""}</p>
                       <input type="number" placeholder="0" value={answers[q.id]?.[cIdx] || ""} onChange={(e) => handleCountingChange(q.id, cIdx, e.target.value)} />
                     </div>
                   ))}
@@ -369,13 +408,13 @@ function Quiz() {
                   {q.options.passage && <div className="reading-text-box">{q.options.passage}</div>}
                   {q.options.questions.map((rq, rqIdx) => (
                     <div key={rqIdx} className="reading-q-block">
-                      <p><b>{rqIdx+1}. {rq.question}</b></p>
+                      <p><b>{rqIdx+1}. {rq.question || ""}</b></p>
                       <div className="reading-choices-grid">
                         {rq.choices.map((c, cIdx) => (
                           <button key={cIdx} className={`choice-btn ${answers[q.id]?.[rqIdx] === cIdx ? 'active' : ''}`} onClick={() => {
                             const cur = answers[q.id] || {};
                             setAnswers({ ...answers, [q.id]: { ...cur, [rqIdx]: cIdx } });
-                          }}>{c.text}</button>
+                          }}>{c.text || ""}</button>
                         ))}
                       </div>
                     </div>
@@ -395,12 +434,21 @@ function Quiz() {
                     </div>
                   </div>
                   <div className="canvas-wrapper">
-                    <CanvasDraw key={`canvas-${q.id}`} ref={el => canvasRefs.current[q.id] = el} brushColor={brushColor} brushRadius={4} canvasWidth={window.innerWidth > 600 ? 550 : 300} canvasHeight={350} imgSrc={type === "Coloring Canvas" ? q.content : ""} />
+                    <CanvasDraw 
+                      key={`canvas-${q.id}`} 
+                      ref={el => canvasRefs.current[q.id] = el} 
+                      brushColor={brushColor} 
+                      brushRadius={4} 
+                      lazyRadius={0}
+                      canvasWidth={600} // Lebar default, nanti akan ditarik CSS
+                      canvasHeight={400} 
+                      imgSrc={type === "Coloring Canvas" ? q.content : ""} 
+                    />
                   </div>
                 </div>
               )}
 
-              {type === "Mood/Emoji Picker" && <div className="subjective-notice">🌟 Tugas refleksi: Sistem otomatis memberi nilai penuh!</div>}
+              {type === "Mood/Emoji Picker" && <div className="subjective-notice">📝 Tugas refleksi: Sistem otomatis memberi nilai penuh!</div>}
             </div>
           );
         })}
