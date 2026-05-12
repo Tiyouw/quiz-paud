@@ -6,7 +6,7 @@ function TopNav() {
       <div className="topbar-left">
         {/* Ganti /logo.png dengan nama file logo kamu di folder public/ */}
         <img
-          src="/logo.png"
+          src="/LogoFull-SiKecilPintar.png"
           alt="SiKecilPintar"
           className="logo-image"
           onError={(e) => {
