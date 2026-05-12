@@ -1,6 +1,16 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 function TopNav() {
+  const { isTeacher, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   return (
     <nav className="admin-topbar">
       <div className="topbar-left">
@@ -17,7 +27,20 @@ function TopNav() {
         />
         <h1 className="logo-text" style={{ display: 'none' }}>SiKecilPintar</h1>
       </div>
-      {/* <span className="icon-settings">⚙️</span> */}
+
+      <div className="topbar-right">
+        {!loading && (
+          isTeacher ? (
+            <button type="button" className="btn-auth-action" onClick={handleLogout}>
+              Keluar
+            </button>
+          ) : (
+            <Link to="/login" className="btn-auth-action">
+              Masuk Guru
+            </Link>
+          )
+        )}
+      </div>
     </nav>
   );
 }
