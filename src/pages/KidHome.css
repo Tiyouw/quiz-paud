@@ -1,0 +1,131 @@
+.kid-home-wrapper {
+  font-family: 'Nunito', sans-serif;
+  background-color: #F8F9FA;
+  min-height: 100vh;
+  padding-bottom: 100px;
+  color: #333;
+}
+
+.kid-home-header {
+  padding: 10px 20px 20px;
+  text-align: center;
+}
+
+.kid-home-header h1 {
+  font-size: 1.9rem;
+  color: #2D6A76;
+  margin-bottom: 8px;
+  font-weight: 900;
+}
+
+.kid-home-header p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.kid-chapter-section {
+  padding: 10px 20px;
+}
+
+.kid-loading,
+.kid-empty {
+  text-align: center;
+  color: #666;
+  padding: 40px 20px;
+  font-weight: 700;
+}
+
+.kid-chapter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.kid-chapter-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.kid-chapter-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+}
+
+.kid-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.kid-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #E0F2F1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.kid-chapter-category {
+  background-color: #E0F2F1;
+  color: #00796B;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kid-chapter-card h3 {
+  font-size: 1.15rem;
+  margin: 0 0 6px 0;
+  color: #333;
+}
+
+.kid-meta-text {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+.kid-start-btn {
+  display: block;
+  text-align: center;
+  background: #FCE4EC;
+  color: #AD1457;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.kid-start-btn:hover {
+  background: #F8BBD0;
+}
+
+@media (min-width: 768px) {
+  .kid-home-wrapper {
+    padding: 20px 40px 120px 40px;
+  }
+  .kid-home-header h1 {
+    font-size: 2.2rem;
+  }
+  .kid-chapter-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+  }
+}

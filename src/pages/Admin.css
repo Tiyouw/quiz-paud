@@ -14,12 +14,42 @@
   align-items: center;
   padding: 20px;
   background: transparent;
+  gap: 15px;
 }
 
 .topbar-left {
   display: flex;
   align-items: center;
   gap: 15px;
+  min-width: 0;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-auth-action {
+  display: inline-block;
+  background: transparent;
+  border: 2px solid #2D6A76;
+  color: #2D6A76;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 7px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.btn-auth-action:hover {
+  background: #2D6A76;
+  color: white;
 }
 
 .icon-settings {
