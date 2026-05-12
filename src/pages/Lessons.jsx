@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useAuth } from '../contexts/AuthContext';
 import './Lessons.css';
 
 function Lessons() {
   const navigate = useNavigate();
+  const { isTeacher } = useAuth();
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Semua');
@@ -124,9 +126,11 @@ function Lessons() {
             <h2>Pustaka Pelajaran</h2>
             <p>Jelajahi kategori dan temukan materi pembelajaran yang menyenangkan.</p>
           </div>
-          <button className="btn-add-lesson" onClick={openModalForAdd}>
-            <span className="icon-plus">✨</span> Tambah Bab Baru
-          </button>
+          {isTeacher && (
+            <button className="btn-add-lesson" onClick={openModalForAdd}>
+              <span className="icon-plus">✨</span> Tambah Bab Baru
+            </button>
+          )}
         </div>
       </header>
 
@@ -150,11 +154,13 @@ function Lessons() {
             filteredChapters.map((chapter) => (
               <div className="lesson-card" key={chapter.id}>
                
-                {/* TOMBOL AKSI POJOK KANAN ATAS */}
-                <div className="card-top-actions">
-                  <button className="btn-card-edit" onClick={() => openModalForEdit(chapter)} title="Edit Bab">✏️</button>
-                  <button className="btn-card-delete" onClick={() => confirmDelete(chapter.id)} title="Hapus Bab">🗑️</button>
-                </div>
+                {/* TOMBOL AKSI POJOK KANAN ATAS (khusus Guru) */}
+                {isTeacher && (
+                  <div className="card-top-actions">
+                    <button className="btn-card-edit" onClick={() => openModalForEdit(chapter)} title="Edit Bab">✏️</button>
+                    <button className="btn-card-delete" onClick={() => confirmDelete(chapter.id)} title="Hapus Bab">🗑️</button>
+                  </div>
+                )}
 
                 <div className="lesson-icon bg-light-blue">
                   {chapter.icon || '📚'}
@@ -166,7 +172,9 @@ function Lessons() {
                 <div className="lesson-actions-container">
                   <div className="lesson-actions-top">
                     <span className="category-badge">{chapter.Category || 'Umum'}</span>
-                    <Link to={`/chapter/${chapter.id}`} className="btn-edit-lesson">Kelola Soal</Link>
+                    {isTeacher && (
+                      <Link to={`/chapter/${chapter.id}`} className="btn-edit-lesson">Kelola Soal</Link>
+                    )}
                   </div>
                   {/* TOMBOL BARU: MULAI KUIS */}
                   <Link to={`/quiz/${chapter.id}`} className="btn-start-quiz">

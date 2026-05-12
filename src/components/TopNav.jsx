@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 function TopNav() {
@@ -29,10 +29,16 @@ function TopNav() {
       </div>
 
       <div className="topbar-right">
-        {!loading && isTeacher && (
-          <button type="button" className="btn-auth-action" onClick={handleLogout}>
-            Keluar
-          </button>
+        {!loading && (
+          isTeacher ? (
+            <button type="button" className="btn-auth-action" onClick={handleLogout}>
+              Keluar
+            </button>
+          ) : (
+            <Link to="/login" className="btn-auth-action">
+              Masuk Guru
+            </Link>
+          )
         )}
       </div>
     </nav>
