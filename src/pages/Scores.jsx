@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useSchool } from '../contexts/SchoolContext';
 import './Scores.css';
 
 function Scores() {
+  const { selectedSchool } = useSchool();
   const [scores, setScores] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchScores();
-  }, []);
+  }, [selectedSchool]);
 
   async function fetchScores() {
     try {
@@ -25,6 +27,7 @@ function Scores() {
           created_at,
           chapters (title)
         `)
+        .eq('school_id', selectedSchool?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;

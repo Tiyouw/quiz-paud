@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import { useSchool } from "../contexts/SchoolContext";
 import "./Quiz.css";
 import CanvasDraw from "react-canvas-draw";
 
 function Quiz() {
   const { chapterId } = useParams();
+  const { selectedSchool } = useSchool();
   const [chapter, setChapter] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -208,7 +210,7 @@ function Quiz() {
     const score = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
     setFinalScore(score);
     setIsFinished(true);
-    await supabase.from("scores").insert([{ chapter_id: chapterId, student_name: studentName, score: score }]);
+    await supabase.from("scores").insert([{ chapter_id: chapterId, student_name: studentName, score: score, school_id: selectedSchool?.id }]);
   };
 
   if (loading) return <div className="quiz-loading">Memuat...</div>;

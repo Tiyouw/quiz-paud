@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useSchool } from '../contexts/SchoolContext';
 import './Admin.css';
 
 function Admin() {
+  const { selectedSchool } = useSchool();
   const [chapters, setChapters] = useState([]);
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [selectedSchool]);
 
   async function fetchDashboardData() {
     try {
@@ -26,6 +28,7 @@ function Admin() {
       const { data: scoresData, error: scoresError } = await supabase
         .from('scores')
         .select('*, chapters(title)')
+        .eq('school_id', selectedSchool?.id)
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -43,6 +46,7 @@ function Admin() {
     <div className="admin-wrapper">
       <header className="admin-header">
         <h2>Halo, Guru Pintar! 👋</h2>
+        <p>Sekolah: {selectedSchool?.name || '-'}</p>
         <p>Mari lihat ringkasan aktivitas belajar hari ini.</p>
       </header>
 
