@@ -1,0 +1,33 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Create SchoolContext, school selection page with Netflix-style card grid, access code verification modal, and session persistence via localStorage. Extend ProtectedRoute to require school selection. Add 'Ganti Sekolah' button to TopNav.",
+  "status": "in_progress",
+  "steps": [
+    "Step 1: Create src/contexts/SchoolContext.jsx - a new React context that provides: selectedSchool (object with id, name or null), selectSchool(school), clearSchool(), loading state. On mount, check localStorage for 'selectedSchool' JSON. Provide these values to all children.",
+    "Step 2: Create src/pages/SchoolSelect.jsx - Netflix-style school selection page. Fetch schools from supabase 'schools' table (select id, name). Display as a responsive grid of large, touch-friendly cards (min 120px tall, rounded corners, shadow, teal accent). Each card shows the TK name prominently. When a card is clicked, show a modal/inline input asking 'Masukkan kode akses' with a simple short text input and a 'Masuk' button. On submit, query supabase: select id, name from schools where id = selectedSchool.id AND access_code = inputValue. If match, call selectSchool({id, name}), save to localStorage, and navigate to '/'. If no match, show error 'Kode akses salah'. The page should have the app logo at top, title 'Pilih Sekolah Anda', and be fully mobile-responsive.",
+    "Step 3: Create src/pages/SchoolSelect.css - styling for the school selection page. Netflix-style card grid (CSS Grid, auto-fill, minmax(260px, 1fr)). Cards with background gradient or solid color, large text, hover/active states with scale transform. Modal overlay for code input with centered card. Mobile-first with comfortable touch targets (min 48px tap area).",
+    "Step 4: Update src/App.jsx - Import SchoolProvider and wrap it inside AuthProvider (or alongside it). Import SchoolSelect page. Add route: '/select-school' -> SchoolSelect (public, no ProtectedRoute). Keep existing routes but wrap them with a new SchoolProtectedRoute or extend ProtectedRoute to also check school selection.",
+    "Step 5: Update src/components/ProtectedRoute.jsx - In addition to checking isTeacher, also check that selectedSchool is not null (from SchoolContext). If no school selected, redirect to '/select-school' instead of '/login'. Keep existing login check first (if not logged in, go to login; if logged in but no school, go to select-school).",
+    "Step 6: Update src/components/TopNav.jsx - Add a 'Ganti Sekolah' button next to the 'Keluar' button (only shown when a school is selected and user is authenticated). When clicked, call clearSchool() from SchoolContext (which clears localStorage) and navigate to '/select-school'. Also display the current school name as a small badge/label in the topbar.",
+    "Step 7: Update src/main.jsx - Wrap App with SchoolProvider if not done in App.jsx (preference is to add SchoolProvider in App.jsx around the routes, inside AuthProvider).",
+    "Step 8: Provide SQL migration for the 'schools' table: CREATE TABLE schools (id uuid DEFAULT gen_random_uuid() PRIMARY KEY, name text NOT NULL, access_code text NOT NULL, created_at timestamptz DEFAULT now()); INSERT INTO schools (name, access_code) VALUES ('TK Dewi Masyithoh 69 Keting', '69'), ('TK Dewi Masyithoh 59 Jombang', '59'), ('TK DARUTTAQWA Jombang', '01'), ('TK Dewi Masyithoh 15 Keting', '15'), ('TK Dharma Wanita 02 Padomasan', '02'); Save this as supabase/migrations/001_create_schools.sql"
+  ],
+  "acceptance_criteria": [
+    "SchoolContext provides selectedSchool, selectSchool, clearSchool to all components",
+    "SchoolSelect page fetches school list from Supabase 'schools' table and renders as a card grid",
+    "Clicking a school card prompts for access code input",
+    "Correct code stores school in localStorage and navigates to home",
+    "Incorrect code shows error message in Indonesian",
+    "ProtectedRoute redirects to /select-school if no school is selected (but user is logged in)",
+    "TopNav shows current school name and a 'Ganti Sekolah' button that clears selection",
+    "SQL migration file exists with correct schema and seed data",
+    "npm run build succeeds without errors"
+  ],
+  "verification": [
+    "Run `npm run build` in /projects/sandbox/quiz-paud and confirm it succeeds",
+    "Run `npm run lint` and confirm no errors (warnings acceptable)"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

@@ -1,0 +1,207 @@
+.school-select-page {
+  min-height: 100vh;
+  padding: 24px 16px;
+  background: linear-gradient(135deg, #f0f7f8 0%, #e8f4f6 100%);
+  font-family: 'Nunito', sans-serif;
+}
+
+.school-select-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.school-select-logo {
+  max-width: 180px;
+  height: auto;
+  margin-bottom: 16px;
+}
+
+.school-select-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2D6A76;
+  margin: 0;
+}
+
+.school-select-loading,
+.school-select-empty {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #555;
+  margin-top: 48px;
+}
+
+/* Netflix-style card grid */
+.school-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.school-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  padding: 24px 16px;
+  background: #fff;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(45, 106, 118, 0.12);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Nunito', sans-serif;
+}
+
+.school-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 24px rgba(45, 106, 118, 0.2);
+}
+
+.school-card:active {
+  transform: scale(0.98);
+}
+
+.school-card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.school-card-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2D6A76;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Modal overlay */
+.school-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.school-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.school-modal-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #2D6A76;
+  margin: 0 0 20px;
+}
+
+.school-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.school-modal-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+}
+
+.school-modal-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1.1rem;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.school-modal-input:focus {
+  border-color: #2D6A76;
+}
+
+.school-modal-error {
+  color: #e53e3e;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.school-modal-submit {
+  padding: 14px 24px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  background: #2D6A76;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  min-height: 48px;
+  transition: background 0.2s;
+}
+
+.school-modal-submit:hover {
+  background: #245860;
+}
+
+.school-modal-submit:disabled {
+  background: #9ab8be;
+  cursor: not-allowed;
+}
+
+.school-modal-close {
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #666;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  min-height: 48px;
+  transition: background 0.2s;
+}
+
+.school-modal-close:hover {
+  background: #f5f5f5;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .school-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .school-select-title {
+    font-size: 1.3rem;
+  }
+
+  .school-card {
+    min-height: 120px;
+    padding: 20px 12px;
+  }
+
+  .school-modal {
+    padding: 24px 16px;
+  }
+}
