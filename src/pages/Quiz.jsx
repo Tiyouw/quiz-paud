@@ -210,7 +210,13 @@ function Quiz() {
     const score = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
     setFinalScore(score);
     setIsFinished(true);
-    await supabase.from("scores").insert([{ chapter_id: chapterId, student_name: studentName, score: score, school_id: selectedSchool?.id }]);
+
+    if (!selectedSchool?.id) {
+      console.error("Cannot save score: no school selected");
+      return;
+    }
+
+    await supabase.from("scores").insert([{ chapter_id: chapterId, student_name: studentName, score: score, school_id: selectedSchool.id }]);
   };
 
   if (loading) return <div className="quiz-loading">Memuat...</div>;

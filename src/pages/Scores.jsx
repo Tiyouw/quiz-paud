@@ -11,33 +11,33 @@ function Scores() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    async function fetchScores() {
+      try {
+        setLoading(true);
+        // Mengambil data skor, pastikan tabel 'scores' sudah ada di Supabase
+        const { data, error } = await supabase
+          .from('scores')
+          .select(`
+            id,
+            student_name,
+            score,
+            created_at,
+            chapters (title)
+          `)
+          .eq('school_id', selectedSchool?.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setScores(data);
+      } catch (error) {
+        console.error("Error fetching scores:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchScores();
   }, [selectedSchool]);
-
-  async function fetchScores() {
-    try {
-      setLoading(true);
-      // Mengambil data skor, pastikan tabel 'scores' sudah ada di Supabase
-      const { data, error } = await supabase
-        .from('scores')
-        .select(`
-          id,
-          student_name,
-          score,
-          created_at,
-          chapters (title)
-        `)
-        .eq('school_id', selectedSchool?.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setScores(data);
-    } catch (error) {
-      console.error("Error fetching scores:", error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   // Filter pencarian berdasarkan nama siswa
   const filteredScores = scores.filter(score =>

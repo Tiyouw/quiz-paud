@@ -11,36 +11,36 @@ function Admin() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        setLoading(true);
+        
+        // Mengambil 3 Bab dari database
+        const { data: chaptersData, error: chaptersError } = await supabase
+          .from('chapters')
+          .select('*')
+          .limit(3);
+
+        // Mengambil 10 Riwayat skor terbaru
+        const { data: scoresData, error: scoresError } = await supabase
+          .from('scores')
+          .select('*, chapters(title)')
+          .eq('school_id', selectedSchool?.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (chaptersError) throw chaptersError;
+        setChapters(chaptersData || []);
+        setScores(scoresData || []);
+      } catch (error) {
+        console.error("Error loading dashboard:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchDashboardData();
   }, [selectedSchool]);
-
-  async function fetchDashboardData() {
-    try {
-      setLoading(true);
-      
-      // Mengambil 3 Bab dari database
-      const { data: chaptersData, error: chaptersError } = await supabase
-        .from('chapters')
-        .select('*')
-        .limit(3);
-
-      // Mengambil 10 Riwayat skor terbaru
-      const { data: scoresData, error: scoresError } = await supabase
-        .from('scores')
-        .select('*, chapters(title)')
-        .eq('school_id', selectedSchool?.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (chaptersError) throw chaptersError;
-      setChapters(chaptersData || []);
-      setScores(scoresData || []);
-    } catch (error) {
-      console.error("Error loading dashboard:", error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return (
     <div className="admin-wrapper">
